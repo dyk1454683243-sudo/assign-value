@@ -2,11 +2,9 @@
 
 var utils = require('./utils');
 
-var UNSAFE_PATH_KEYS = {
-  '__proto__': true,
-  constructor: true,
-  prototype: true
-};
+function isUnsafeKey(key) {
+  return key === '__proto__' || key === 'constructor' || key === 'prototype';
+}
 
 function isUnsafePath(prop) {
   if (typeof prop !== 'string') {
@@ -17,7 +15,7 @@ function isUnsafePath(prop) {
   var i = 0;
 
   for (; i < segments.length; i++) {
-    if (UNSAFE_PATH_KEYS[segments[i]] === true) {
+    if (isUnsafeKey(segments[i])) {
       return true;
     }
   }
