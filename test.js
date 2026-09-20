@@ -42,4 +42,32 @@ describe('assign', function () {
       assign();
     }).should.throw('expected the first argument to be an object.');
   });
+
+  it('should not pollute Object.prototype via __proto__ path:', function () {
+    delete Object.prototype.polluted;
+
+    (function () {
+      assign({}, '__proto__.polluted', 'yes');
+    }).should.throw('cannot assign to prototype path.');
+
+    assert.strictEqual({}.polluted, undefined);
+    assert.strictEqual(Object.prototype.hasOwnProperty('polluted'), false);
+  });
+
+  it('should not pollute Object.prototype via constructor.prototype path:', function () {
+    delete Object.prototype.polluted;
+
+    (function () {
+      assign({}, 'constructor.prototype.polluted', 'yes');
+    }).should.throw('cannot assign to prototype path.');
+
+    assert.strictEqual({}.polluted, undefined);
+    assert.strictEqual(Object.prototype.hasOwnProperty('polluted'), false);
+  });
+
+  it('should still assign a normal nested path like a.b.c:', function () {
+    var obj = {};
+    assign(obj, 'a.b.c', 'yes');
+    obj.a.b.c.should.equal('yes');
+  });
 });
